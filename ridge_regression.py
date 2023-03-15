@@ -12,7 +12,7 @@ warnings.filterwarnings('ignore')
 DB_NAME = "aiml_optimizations"
 DB_USER = "postgres"
 DB_PASS = "postgres"
-DB_HOST = "15.207.20.67"
+DB_HOST = "192.168.122.173"
 DB_PORT = "5432"
 
 try:
@@ -80,6 +80,16 @@ train_patched = timer() - start
 print(f"Intel® extension for Scikit-learn time: {train_patched:.2f} s")
 
 cur = conn.cursor()
+create_table_query = f'''
+create table if not exists ridge_regression(
+	dataset_name varchar(255),
+	datetime varchar(255),
+	model_name varchar(255) primary key,
+	total_time_taken real
+)
+'''
+cur.execute(create_table_query)
+
 query = f'''
 	INSERT INTO ridge_regression( 
 dataset_name,
