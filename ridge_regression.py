@@ -12,7 +12,7 @@ warnings.filterwarnings('ignore')
 DB_NAME = "aiml_optimizations"
 DB_USER = "postgres"
 DB_PASS = "postgres"
-DB_HOST = "192.168.122.173"
+DB_HOST = "192.168.122.172"
 DB_PORT = "5432"
 
 try:

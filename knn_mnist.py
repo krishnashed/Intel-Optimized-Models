@@ -11,7 +11,7 @@ from datetime import datetime
 DB_NAME = "aiml_optimizations"
 DB_USER = "postgres"
 DB_PASS = "postgres"
-DB_HOST = "192.168.122.173"
+DB_HOST = "192.168.122.172"
 DB_PORT = "5432"
 
 try:
@@ -29,7 +29,7 @@ except:
 # x = df.iloc[:,:-1]
 # y = df.iloc[:, -1]
 dataset = 'mnist_784'
-x, y = fetch_openml(name=dataset, return_X_y=True, parser='auto')
+x, y = fetch_openml(name=dataset, return_X_y=True)
 
 
 
