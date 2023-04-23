@@ -6,27 +6,27 @@ import numpy as np
 import requests
 import warnings
 import os
-import psycopg2
+# import psycopg2
 from datetime import datetime
 from IPython.display import HTML
 warnings.filterwarnings('ignore')
 
 
-DB_NAME = "aiml_optimizations"
-DB_USER = "postgres"
-DB_PASS = "postgres"
-DB_HOST = "192.168.122.172"
-DB_PORT = "5432"
+# DB_NAME = "aiml_optimizations"
+# DB_USER = "postgres"
+# DB_PASS = "postgres"
+# DB_HOST = "192.168.122.172"
+# DB_PORT = "5432"
 
-try:
-	conn = psycopg2.connect(database=DB_NAME,
-							user=DB_USER,
-							password=DB_PASS,
-							host=DB_HOST,
-							port=DB_PORT)
-	print("Database connected successfully")
-except:
-	print("Database not connected successfully")
+# try:
+# 	conn = psycopg2.connect(database=DB_NAME,
+# 							user=DB_USER,
+# 							password=DB_PASS,
+# 							host=DB_HOST,
+# 							port=DB_PORT)
+# 	print("Database connected successfully")
+# except:
+# 	print("Database not connected successfully")
 
 
 dataset_dir = 'data'
@@ -71,7 +71,6 @@ from sklearnex import patch_sklearn
 patch_sklearn()
 
 
-
 from sklearn.linear_model import Lasso
 
 params = {
@@ -88,43 +87,41 @@ train_patched = timer() - start
 print(f"Intel® extension for Scikit-learn time: {train_patched:.2f} s")
 
 
-cur = conn.cursor()
-create_table_query = f'''
-create table if not exists lasso_regression(
-	dataset_name varchar(255),
-	datetime varchar(255),
-	model_name varchar(255) primary key,
-	total_time_taken real
-)
-'''
-cur.execute(create_table_query)
+# cur = conn.cursor()
+# create_table_query = f'''
+# create table if not exists lasso_regression(
+# 	dataset_name varchar(255),
+# 	datetime varchar(255),
+# 	model_name varchar(255) primary key,
+# 	total_time_taken real
+# )
+# '''
+# cur.execute(create_table_query)
 
 
-query = f'''
-	INSERT INTO lasso_regression( 
-dataset_name,
-datetime,
-model_name,
-total_time_taken
-) VALUES('{dataset_name}','{dt_string}','optimized lasso_regression', {train_patched}) 
-on conflict (model_name) do nothing;
+# query = f'''
+# 	INSERT INTO lasso_regression( 
+# dataset_name,
+# datetime,
+# model_name,
+# total_time_taken
+# ) VALUES('{dataset_name}','{dt_string}','optimized lasso_regression', {train_patched}) 
+# on conflict (model_name) do nothing;
 
 
-update lasso_regression set datetime = '{dt_string}', total_time_taken = {train_patched} where model_name = 'optimized lasso_regression' returning *;
-'''
+# update lasso_regression set datetime = '{dt_string}', total_time_taken = {train_patched} where model_name = 'optimized lasso_regression' returning *;
+# '''
 
-cur.execute(query)
-conn.commit()
+# cur.execute(query)
+# conn.commit()
 
 y_predict = model.predict(x_test)
 mse_metric_opt = metrics.mean_squared_error(y_test, y_predict)
 print(f'Patched Scikit-learn MSE: {mse_metric_opt}')
 
 
-
 from sklearnex import unpatch_sklearn
 unpatch_sklearn()
-
 
 
 from sklearn.linear_model import Lasso
@@ -137,29 +134,25 @@ model = Lasso(**params).fit(x_train, y_train)
 train_unpatched = timer() - start
 print(f"Original Scikit-learn time: {train_unpatched:.2f} s")
 
-query = f'''
-	INSERT INTO lasso_regression( 
-dataset_name,
-datetime,
-model_name,
-total_time_taken
-) VALUES('{dataset_name}','{dt_string}','unoptimized lasso_regression', {train_unpatched}) 
-on conflict (model_name) do nothing;
+# query = f'''
+# 	INSERT INTO lasso_regression( 
+# dataset_name,
+# datetime,
+# model_name,
+# total_time_taken
+# ) VALUES('{dataset_name}','{dt_string}','unoptimized lasso_regression', {train_unpatched}) 
+# on conflict (model_name) do nothing;
 
 
-update lasso_regression set datetime = '{dt_string}', total_time_taken = {train_unpatched} where model_name = 'unoptimized lasso_regression' returning *;
-'''
+# update lasso_regression set datetime = '{dt_string}', total_time_taken = {train_unpatched} where model_name = 'unoptimized lasso_regression' returning *;
+# '''
 
-cur.execute(query)
-conn.commit()
+# cur.execute(query)
+# conn.commit()
 
 y_predict = model.predict(x_test)
 mse_metric_original = metrics.mean_squared_error(y_test, y_predict)
 print(f'Original Scikit-learn MSE: {mse_metric_original}')
 
 
-
 print(f'Get speedup in {(train_unpatched/train_patched):.1f} times.')
-
-
-

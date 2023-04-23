@@ -5,26 +5,26 @@ import warnings
 from sklearn.datasets import fetch_openml
 from sklearn.preprocessing import LabelEncoder
 from IPython.display import HTML
-import psycopg2
+# import psycopg2
 from datetime import datetime
 warnings.filterwarnings('ignore')
 
-DB_NAME = "aiml_optimizations"
-DB_USER = "postgres"
-DB_PASS = "postgres"
-DB_HOST = "192.168.122.172"
-DB_PORT = "5432"
+# DB_NAME = "aiml_optimizations"
+# DB_USER = "postgres"
+# DB_PASS = "postgres"
+# DB_HOST = "192.168.122.172"
+# DB_PORT = "5432"
 
 
-try:
-	conn = psycopg2.connect(database=DB_NAME,
-							user=DB_USER,
-							password=DB_PASS,
-							host=DB_HOST,
-							port=DB_PORT)
-	print("Database connected successfully")
-except:
-	print("Database not connected successfully")
+# try:
+# 	conn = psycopg2.connect(database=DB_NAME,
+# 							user=DB_USER,
+# 							password=DB_PASS,
+# 							host=DB_HOST,
+# 							port=DB_PORT)
+# 	print("Database connected successfully")
+# except:
+# 	print("Database not connected successfully")
 
 dataset = 'Airlines_DepDelay_10M'
 x, y = fetch_openml(name=dataset, return_X_y=True)
@@ -70,32 +70,32 @@ model = ElasticNet(**params).fit(x_train, y_train)
 train_patched = timer() - start
 print(f"Intel® extension for Scikit-learn time: {train_patched:.2f} s")
 
-cur = conn.cursor()
-create_table_query = f'''
-create table if not exists elastic_net(
-	dataset_name varchar(255),
-	datetime varchar(255),
-	model_name varchar(255) primary key,
-	total_time_taken real
-)
-'''
-cur.execute(create_table_query)
+# cur = conn.cursor()
+# create_table_query = f'''
+# create table if not exists elastic_net(
+# 	dataset_name varchar(255),
+# 	datetime varchar(255),
+# 	model_name varchar(255) primary key,
+# 	total_time_taken real
+# )
+# '''
+# cur.execute(create_table_query)
 
-query = f'''
-	INSERT INTO elastic_net( 
-dataset_name,
-datetime,
-model_name,
-total_time_taken
-) VALUES('{dataset}','{dt_string}','optimized elastic_net', {train_patched}) 
-on conflict (model_name) do nothing;
+# query = f'''
+# 	INSERT INTO elastic_net( 
+# dataset_name,
+# datetime,
+# model_name,
+# total_time_taken
+# ) VALUES('{dataset}','{dt_string}','optimized elastic_net', {train_patched}) 
+# on conflict (model_name) do nothing;
 
 
-update elastic_net set datetime = '{dt_string}', total_time_taken = {train_patched} where model_name = 'optimized elastic_net' returning *;
-'''
+# update elastic_net set datetime = '{dt_string}', total_time_taken = {train_patched} where model_name = 'optimized elastic_net' returning *;
+# '''
 
-cur.execute(query)
-conn.commit()
+# cur.execute(query)
+# conn.commit()
 
 y_predict = model.predict(x_test)
 mse_metric_opt = metrics.mean_squared_error(y_test, y_predict)
@@ -114,21 +114,21 @@ model = ElasticNet(**params).fit(x_train, y_train)
 train_unpatched = timer() - start
 print(f"Original Scikit-learn time: {train_unpatched:.2f} s")
 
-query = f'''
-	INSERT INTO elastic_net( 
-dataset_name,
-datetime,
-model_name,
-total_time_taken
-) VALUES('{dataset}','{dt_string}','unoptimized elastic_net', {train_unpatched}) 
-on conflict (model_name) do nothing;
+# query = f'''
+# 	INSERT INTO elastic_net( 
+# dataset_name,
+# datetime,
+# model_name,
+# total_time_taken
+# ) VALUES('{dataset}','{dt_string}','unoptimized elastic_net', {train_unpatched}) 
+# on conflict (model_name) do nothing;
 
 
-update elastic_net set datetime = '{dt_string}', total_time_taken = {train_unpatched} where model_name = 'unoptimized elastic_net' returning *;
-'''
+# update elastic_net set datetime = '{dt_string}', total_time_taken = {train_unpatched} where model_name = 'unoptimized elastic_net' returning *;
+# '''
 
-cur.execute(query)
-conn.commit()
+# cur.execute(query)
+# conn.commit()
 
 
 y_predict = model.predict(x_test)
