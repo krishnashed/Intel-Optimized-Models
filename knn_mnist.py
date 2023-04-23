@@ -53,7 +53,7 @@ start = timer()
 knn = KNeighborsClassifier(**params).fit(x_train, y_train)
 predicted = knn.predict(x_test)
 time_opt = timer() - start
-f"Intel® extension for Scikit-learn time: {time_opt:.2f} s"
+print(f"Intel® extension for Scikit-learn time: {time_opt:.2f} s")
 
 # cur = conn.cursor()
 # create_table_query = f'''
@@ -99,7 +99,7 @@ start = timer()
 knn = KNeighborsClassifier(**params).fit(x_train, y_train)
 predicted = knn.predict(x_test)
 time_original = timer() - start
-f"Original Scikit-learn time: {time_original:.2f} s"
+print(f"Original Scikit-learn time: {time_original:.2f} s")
 
 
 # query = f'''
